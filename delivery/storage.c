@@ -79,37 +79,37 @@ static int inputPasswd(int x, int y) {
 //char* filepath : filepath and name to write
 //return : 0 - backup was successfully done, -1 - failed to backup
 int str_backupSystem(char* filepath) {
-    FILE *fp;
-    int i,j;
+   FILE *fp;
+   int i,j;
 
-    fp = fopen(filepath, "w");
-    
-    if(fp == NULL) // if exception
-    {
-        return -1;
-    }
-    
-    fprintf(fp, systemSize[0], systemSize[1]); //row, column
-    fprintf(fp, "1234");//master passwd
-    
-    for(i=0; i<systemSize[0]; i++) // if someone has package then write in file( include existing information)
-    {
-        for(j=0; j<systemSize[1]; j++)
-        {
-            if(deliverySystem[i][j].cnt == 1)
-            {
-                fprintf(fp, deliverySystem[i][j].building);
-                //fprint(fp, " ");
-                fprintf(fp, deliverySystem[i][j].room);
-                fprintf(fp, deliverySystem[i][j].passwd);
-                fprintf(fp, deliverySystem[i][j].context);
-            }
-        }
-    }
-    
-    fclose(fp);
-    
-    return 0;
+   fp = fopen(filepath, "w");
+   
+   if(fp == NULL) // if exception
+   {
+      return -1;
+   }
+   
+   fprintf(fp, "%d %d", systemSize[0], systemSize[1]);
+   fprintf(fp, "%s", masterPassword);
+   
+   for(i=0;i<systemSize[0]; i++)
+   {
+      for(j=0;j<systemSize[1]; j++)
+      {
+         if(deliverySystem[i][j].cnt == 1)
+         {
+            fprintf(fp, "%d %d %s ",deliverySystem[i][j].building, deliverySystem[i][j].room, deliverySystem[i][j].passwd);
+
+            fprintf(fp, "%s\n",deliverySystem[i][j].context);
+         }
+         
+      }
+      
+   }
+   
+   fclose(fp);
+   
+   return 0;
 }
 
 
@@ -149,6 +149,7 @@ int str_createSystem(char* filepath) {
             //ex: 0 0 3 103 1234 noPassword
             //from building number to passwd
             fscanf( fp, "%d %d", &x, &y);//row, column
+            deliverySystem[x][y].cnt++;
             fscanf( fp, "%d %d %s", &deliverySystem[x][y].building, &deliverySystem[x][y].room, deliverySystem[x][y].passwd);//building, room, passwd
             //context
             deliverySystem[x][y].context = (char*)malloc(sizeof(char)*20);
@@ -176,14 +177,6 @@ int str_createSystem(char* filepath) {
     //        }
     //    }
         
-        
-        
-        for(i=0;i<systemSize[0];i++)
-        {
-            free(deliverySystem[i]);
-        }
-        free(deliverySystem);
-        
         fclose(fp);
     
     return 0;
@@ -191,7 +184,13 @@ int str_createSystem(char* filepath) {
 
 //free the memory of the deliverySystem
 void str_freeSystem(void) {
+    int i;
     
+    for(i=0;i<systemSize[0];i++)
+    {
+        free(deliverySystem[i]);
+    }
+    free(deliverySystem);
 }
 
 
@@ -253,19 +252,27 @@ int str_checkStorage(int x, int y) {
 //char passwd[] : password string (4 characters)
 //return : 0 - successfully put the package, -1 - failed to put
 int str_pushToStorage(int x, int y, int nBuilding, int nRoom, char msg[MAX_MSG_SIZE+1], char passwd[PASSWD_LEN+1]) {
+    int i;
     
     if(deliverySystem[x][y].cnt == 0)
     {
         deliverySystem[x][y].building = nBuilding;
         deliverySystem[x][y].room = nRoom;
-        deliverySystem[x][y].context = msg[MAX_MSG_SIZE+1];
-        deliverySystem[x][y].passwd = passwd[PASSWD_LEN+1];
+        deliverySystem[x][y].context = msg;
+        for (i=0;i<sizeof(passwd[PASSWD_LEN+1]);i++)
+        {
+           deliverySystem[x][y].passwd[i] = passwd[i];
+        }
+        
         
         deliverySystem[x][y].cnt++;
-        return 0;
+    }
+    else
+    {
+        return -1;
     }
 
-    return -1;
+    return 0;
 }
 
 
@@ -276,6 +283,7 @@ int str_pushToStorage(int x, int y, int nBuilding, int nRoom, char msg[MAX_MSG_S
 //return : 0 - successfully extracted, -1 = failed to extract
 int str_extractStorage(int x, int y) {
     
+    return 0;
 }
 
 //find my package from the storage
@@ -283,6 +291,31 @@ int str_extractStorage(int x, int y) {
 //int nBuilding, int nRoom : my building/room numbers
 //return : number of packages that the storage system has
 int str_findStorage(int nBuilding, int nRoom) {
-    
-    return cnt;
+   
+   int i, j;
+   
+   for (i=0;i<systemSize[0];i++)
+   {
+      for (j=0;j<systemSize[1];j++)
+      {
+         if (deliverySystem[i][j].cnt > 0) // if resident has some packagem then show
+         {
+            if(nBuilding == deliverySystem[i][j].building && nRoom == deliverySystem[i][j].room)
+            {
+               printf("-----------> Found a package in (%d, %d)\n", i, j);
+               return 1;
+            }
+            else // when there is no resisdent information then the resident failed to find her package
+            {
+               return 0;
+            }
+   
+         }
+         else // cnt == 0 means no package
+         {
+            return 0; // 0 = failed to find my package
+         }
+      }
+   }
+   return 1;
 }
