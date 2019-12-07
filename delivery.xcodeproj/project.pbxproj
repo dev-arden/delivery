@@ -28,7 +28,6 @@
 		B7AF2E172393B2B700592386 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		B7AF2E1E2393B2F900592386 /* storage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = storage.h; sourceTree = "<group>"; };
 		B7AF2E1F2393B2F900592386 /* storage.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = storage.c; sourceTree = "<group>"; };
-		B7AF2E212393BB7100592386 /* storage.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = storage.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,7 +60,6 @@
 		B7AF2E162393B2B700592386 /* delivery */ = {
 			isa = PBXGroup;
 			children = (
-				B7AF2E212393BB7100592386 /* storage.txt */,
 				B7AF2E172393B2B700592386 /* main.c */,
 				B7AF2E1E2393B2F900592386 /* storage.h */,
 				B7AF2E1F2393B2F900592386 /* storage.c */,
